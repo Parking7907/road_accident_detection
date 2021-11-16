@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+Demo
+datasets
+exp
+figures
+name
+UCF_cropped
