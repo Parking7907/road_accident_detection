@@ -16,6 +16,7 @@ import torch
 import logging
 import json
 import time
+import numpy as np
 
 class ModelTrainer:
 
@@ -83,7 +84,6 @@ class ModelTrainer:
                 self.scheduler.step()
             elif self.sch_name == 'plateau':
                 self.scheduler.step(valid_loss)
-
             self.logger.info("epoch: {} --- t_loss : {:0.3f}, train_acc = {}%, v_loss: {:0.3f}, val_acc: {}%, best_acc: {}%, best_epoch: {}, time: {:0.2f}s"\
                                                             .format(epoch, train_loss, t_accuracy, valid_loss, v_accuracy, self.best_acc, self.best_epoch, duration))
             
@@ -104,10 +104,10 @@ class ModelTrainer:
 
     def train_single_epoch(self, epoch):
         self.model.train()
-        total_loss = 0.1
+        total_loss = 0.0
         accuracy = 0.0
         correct_cnt = 0
-        tot_cnt = 0.1
+        tot_cnt = 0.0
 
         batch_size = len(self.train_loader)
         for b, batch in enumerate(self.train_loader):
@@ -130,9 +130,13 @@ class ModelTrainer:
             
             correct_cnt += (argmax == labels).sum()
             tot_cnt += B
-                    
-            
+            if torch.isnan(batch_loss):
+                print(name)
+
             print("{}/{} --- {}".format(b, batch_size, batch_loss), end='\r')
+        
+        if np.isnan(total_loss):
+            print("is nan on", str(epoch), )
 
         return total_loss, (correct_cnt.item()/tot_cnt)*100
 
@@ -140,10 +144,10 @@ class ModelTrainer:
     def inference(self, epoch):
         
         self.model.eval()
-        total_loss = 0.1
+        total_loss = 0.0
         accuracy = 0.0
         correct_cnt = 0
-        tot_cnt = 0.1
+        tot_cnt = 0.0
 
         with torch.no_grad():
             for b, batch in enumerate(self.valid_loader):
