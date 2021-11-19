@@ -119,7 +119,6 @@ class ModelTrainer:
             
             images = images.to(self.device)
             labels = labels.to(self.device)
-            #pdb.set_trace()
             outputs  = self.model(images)
             batch_loss = self.criterion(outputs, labels)
             batch_loss.backward()
@@ -131,7 +130,9 @@ class ModelTrainer:
             correct_cnt += (argmax == labels).sum()
             tot_cnt += B
             if torch.isnan(batch_loss):
-                print(name)
+                print("nan!!")
+                #print(argmax == labels)
+                #print(names)
 
             print("{}/{} --- {}".format(b, batch_size, batch_loss), end='\r')
         
@@ -139,8 +140,6 @@ class ModelTrainer:
             print("is nan on", str(epoch), )
 
         return total_loss, (correct_cnt.item()/tot_cnt)*100
-
-
     def inference(self, epoch):
         
         self.model.eval()

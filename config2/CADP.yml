@@ -5,9 +5,9 @@ use_tb_logger: true
 #### datasets
 datasets:
   name: CADP
-  train: /home/data/jinyoung/Server/Demo3_B/Train/
-  valid: /home/data/jinyoung/Server/Demo3_B/Test/
-  test: /home/data/jinyoung/Server/Demo3_B/Test/
+  train: /home/data/jinyoung/Server/Demo4/Original/Train
+  valid: /home/data/jinyoung/Server/Demo4/Original/Test
+  test: /home/data/jinyoung/Server/Demo4/Original/Test
   stride: 1
 
 dataloader:
@@ -41,16 +41,16 @@ trainer:
   comment: no comment
     
 tester:
-  ckpt_path: /home/jinyoung/road_accident_detection/exp/CADP/23October_0336/ckpt/best.pt
+  ckpt_path: /home/jinyoung/road_accident_detection/exp/CADP/19November_0953/ckpt/best.pt
   device: 1
-
+#10월 28일의 흔적 0803 = 82%, 0915 = 95% 0710 = 76%
 
 criterion:
   name: CrossEntropy
 
 optimizer:
   name: Adam   ### Adam, RMSprop, SGD
-  lr: !!float 5e-4
+  lr: !!float 1e-3
   # betas: (0.9, 0.999)
   eps: !!float 1e-8
   weight_decay: !!float 1e-6

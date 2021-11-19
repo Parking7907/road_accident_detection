@@ -44,6 +44,8 @@ class ModelTester:
 
     def test(self):
         self.model.eval()
+        video_dict = {}
+        GT_dict = {}
         output_list = []
         label_list = []
         wrong_list = []
@@ -55,8 +57,10 @@ class ModelTester:
         
         with torch.no_grad():
             for b, batch in tqdm(enumerate(self.test_loader), total=len(self.test_loader)):
-                #pdb.set_trace()
+                
                 images, labels, names = batch
+
+                    
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 outputs = self.model(images)
@@ -64,18 +68,61 @@ class ModelTester:
                 # [B x Class]
                 
                 _, output = torch.max(outputs, 1)
-                
+                #pdb.set_trace()
                 output_list.extend(output)
                 label_list.extend(labels)
 
                         
                 batch_acc = float(len(output) - sum(abs(output-labels)))/len(output)
                 
+
+                #frame per video...
+                names_l = list(names)
+                video_n = ['a' for _ in range(len(names_l))]
+                for i, name in enumerate(names_l):
+                    vid_ = os.path.basename(name)
+                    vid_ = vid_.split('_')[0] + vid_.split('_')[2]
+                    video_n[i] = vid_
+                    if vid_ not in video_dict:
+                        video_dict[vid_] = []
+                        GT_dict[vid_] = int(labels[i])
+                    video_dict[vid_].append(int(output[i]))
+                #pdb.set_trace()
                 wrong = np.array(abs(output-labels).cpu())
                 false_index = np.where(wrong == 1)[0]
-                #pdb.set_trace()
                 self.logger.info(f"Batch_Accuracy : {batch_acc}")
-        print("length : ", str(len(output_list)))
+            
+        #print("length : ", str(len(output_list)))
+        #pdb.set_trace()
+        for vid in video_dict:
+            vid_l = len(video_dict[vid])
+            score = 0.0
+            
+            for out_ in video_dict[vid]:
+                score = score + out_
+            score = score / vid_l
+            if score > 0.5:
+                out_ = 1
+            else:
+                out_ = 0
+            print(vid, GT_dict[vid], video_dict[vid], out_)
+            if GT_dict[vid] ==1:
+                if out_==1:
+                    TP += 1
+                    print("TP")
+                elif out_==0:
+                    FP +=1
+                    print("FP")
+            elif GT_dict[vid]==0:
+                if out_==1:
+                    FN += 1
+                    print("FN")
+                elif out_ ==0:
+                    TN +=1
+                    print("TN")
+        
+        #old code = frame별
+        '''
         for i in range(len(output_list)):
             if label_list[i] ==1:
                 if output_list[i]==1:
@@ -87,12 +134,13 @@ class ModelTester:
                     FN += 1
                 elif output_list[i] ==0:
                     TN += 1
-        
+        '''
+        #print(video_dict)
         accuracy_ = (TP + TN) / (TP+TN+FP+FN)
         recall_ = TP / (TP + FN)
         precision_ = TP / (TP+ FP)
         F1_score = 2 * precision_ * recall_ / (precision_ + recall_)
-        print("Positive : TP, FP, Negative, TN, FN:",str(TP + FP), str(TP),str(FP),str(TN + FN),str(TN),str(FN))
+        print("Positive / TP / FP  Negative / TN / FN:",str(TP + FP), str(TP),str(FP),str(TN + FN),str(TN),str(FN))
         self.logger.info(f"Final Accuracy : {accuracy_}")
         self.logger.info(f"Final Recall : {recall_}")
         self.logger.info(f"Final Precision : {precision_}")
