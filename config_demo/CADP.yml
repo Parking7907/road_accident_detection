@@ -5,10 +5,10 @@ use_tb_logger: true
 #### datasets
 datasets:
   name: CADP
-  train: /home/data/jinyoung/Server/Demo6/Original/Train
-  valid: /home/data/jinyoung/Server/Demo6/Original/Test
-  test: /home/data/jinyoung/Server/Demo6/Original/Test
-  demo: /home/jinyoung/road_accident_detection/Demo
+  train: /home/data/jinyoung/Server/Demo5/Original/Train
+  valid: /home/data/jinyoung/Server/Demo5/Original/Test
+  test: /home/jinyoung/road_accident_detection/Demo/
+  demo: /home/jinyoung/road_accident_detection/Demo/
   stride: 1
 #/home/data/jinyoung/Server/Demo5/Original/Test/
 dataloader:
@@ -46,7 +46,7 @@ trainer:
   comment: no comment
     
 tester:
-  ckpt_path: /home/jinyoung/road_accident_detection/exp/CADP/22November_0424/ckpt/best.pt
+  ckpt_path: /home/jinyoung/road_accident_detection/exp/CADP/22November_1124/ckpt/best.pt
   device: 0
 #10월 28일의 흔적 0803 = 82%, 0915 = 95% 0710 = 76%
 

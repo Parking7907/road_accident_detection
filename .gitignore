@@ -128,8 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 Demo
+Demo_data
+result
 datasets
 exp
 figures
 name
 UCF_cropped
+*.pkl

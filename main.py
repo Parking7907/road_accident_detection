@@ -12,6 +12,7 @@ import os
 import pickle
 import numpy as np
 from model_github import MYNET
+from tqdm import tqdm
 
 def train(args):
     with open(os.path.join(args.config,args.dataset + '.yml'), mode='r') as f:
@@ -44,14 +45,35 @@ def test(args):
     #pdb.set_trace()
     test_loader = DataLoader(test_dataset, **config['dataloader']['test'])
     tester = ModelTester(model, test_loader, **config['tester'])
-    output, wrong_list = tester.test()
+    output, name_list = tester.test()
+    output = np.array(output)
+    name_list = np.array(name_list, dtype=object)
+    with open("output.pkl", "wb") as f:
+        pickle.dump(output, f)
+    with open("name.pkl", "wb")as fr:
+        pickle.dump(name_list, fr)
+def demo(args): 
+    with open(os.path.join(args.config,args.dataset + '.yml'), mode='r') as f:
+        config = yaml.load(f,Loader=yaml.FullLoader)
+
+    model = MYNET(**config['MYNET'])
+    
+    if args.dataset == 'CADP':
+        from datasets.CADP import CADP_Demo
+        test_dataset = CADP_Demo(config['datasets']['demo'], config['MYNET']['sequence_size'])
+    print("len : ", str(len(test_dataset)))
+    test_loader = DataLoader(test_dataset, **config['dataloader']['demo'])
+    tester = ModelTester(model, test_loader, **config['tester'])
+    pdb.set_trace()
+    output, wrong_list = tester.demo()
+    print("output, wrong_list:",  output, wrong_list)
+    pdb.set_trace()
     output = np.array(output)
     wrong_list = np.array(wrong_list)
     with open("output.pkl", "wb") as f:
         pickle.dump(output, f)
     with open("name.pkl", "wb")as fr:
         pickle.dump(wrong_list, fr)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -65,3 +87,5 @@ if __name__ == '__main__':
         train(args)
     elif args.mode == 'Test':
         test(args)
+    elif args.mode == 'Demo':
+        demo(args)

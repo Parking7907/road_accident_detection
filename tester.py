@@ -48,7 +48,7 @@ class ModelTester:
         GT_dict = {}
         output_list = []
         label_list = []
-        wrong_list = []
+        name_list = []
         F1_score = 0
         TP = 0
         TN = 0
@@ -57,10 +57,7 @@ class ModelTester:
         
         with torch.no_grad():
             for b, batch in tqdm(enumerate(self.test_loader), total=len(self.test_loader)):
-                
                 images, labels, names = batch
-
-                    
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 outputs = self.model(images)
@@ -72,12 +69,14 @@ class ModelTester:
                 output_list.extend(output)
                 label_list.extend(labels)
 
-                        
+                print("output:", output)
+                print("Labels:", labels)
                 batch_acc = float(len(output) - sum(abs(output-labels)))/len(output)
                 
 
-                #frame per video...
+                #frame to video...
                 names_l = list(names)
+                name_list.append(names_l)
                 video_n = ['a' for _ in range(len(names_l))]
                 for i, name in enumerate(names_l):
                     vid_ = os.path.basename(name)
@@ -94,6 +93,7 @@ class ModelTester:
             
         #print("length : ", str(len(output_list)))
         #pdb.set_trace()
+        
         for vid in video_dict:
             vid_l = len(video_dict[vid])
             score = 0.0
@@ -136,10 +136,10 @@ class ModelTester:
                     TN += 1
         '''
         #print(video_dict)
-        accuracy_ = (TP + TN) / (TP+TN+FP+FN)
-        recall_ = TP / (TP + FN)
-        precision_ = TP / (TP+ FP)
-        F1_score = 2 * precision_ * recall_ / (precision_ + recall_)
+        accuracy_ = (TP + TN) / (TP+TN+FP+FN + 1)
+        recall_ = TP / (TP + FN + 1)
+        precision_ = TP / (TP+ FP + 1)
+        F1_score = 2 * precision_ * recall_ / (precision_ + recall_ + 1)
         print("Positive / TP / FP  Negative / TN / FN:",str(TP + FP), str(TP),str(FP),str(TN + FN),str(TN),str(FN))
         self.logger.info(f"Final Accuracy : {accuracy_}")
         self.logger.info(f"Final Recall : {recall_}")
@@ -149,7 +149,7 @@ class ModelTester:
         label_list = torch.tensor(label_list)
         tot_acc = float(len(output_list) - sum(abs(output_list-label_list)))/len(output_list)
         self.logger.info(f"Final Accuracy : {tot_acc}")
-        return output_list, wrong_list
+        return output_list, name_list
 
     def demo(self):
         """
@@ -160,6 +160,7 @@ class ModelTester:
         total_loss = 0.0
         
         output_list = []
+        wrong_list = []
         
         with torch.no_grad():
             for b, batch in tqdm(enumerate(self.test_loader), total=len(self.test_loader)):
@@ -175,7 +176,7 @@ class ModelTester:
 
                 output_list.append(output)
 
-        return output_list
+        return output_list, wrong_list
 
     def visualizaition(self):
         # to be updated

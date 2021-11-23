@@ -1,4 +1,4 @@
 python main.py \
--c ./config2/ \
+-c ./config_demo/ \
 -d CADP \
 -m Test
