@@ -136,3 +136,6 @@ figures
 name
 UCF_cropped
 *.pkl
+*.wav
+*.mp4
+*.avi

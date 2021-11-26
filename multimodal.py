@@ -4,22 +4,50 @@ from glob import glob
 import pickle
 import pdb
 import os
+from moviepy.editor import *
+
+### Hyper Parameters
+visual_threshold = 0.71
+multimodal_threshold = 0.81
 img_array = []
 label_list =[]
-with open('output_demo6.pkl', 'rb') as fr:
+audio_label_list = []
+#data load
+#with open('output_demo6_1.pkl', 'rb') as fr:
+with open('output_movie0.pkl', 'rb') as fr:
     visual_data = pickle.load(fr)
-with open('name_demo6.pkl', 'rb') as f:
+#with open('name_demo6_1.pkl', 'rb') as f:
+with open('name_movie0.pkl', 'rb') as fr:
     visual_label = pickle.load(f)
-
+#Labeling
+f = open("./label/20_score.txt", 'r', encoding='UTF-8')
+lines = f.readlines()
 for i in range(len(visual_label)):
     for j in range(len(visual_label[i])):
         lab = int(os.path.basename(visual_label[i][j]).split('_')[1])
         label_list.append(lab)
-#print(label_list)
+
+#Audio 처리
+audio_score = [0 for _ in range(len(visual_data))]
+print(len(audio_score))
+for i in range(len(lines)):
+    sc = lines[i].split('\n')[0]
+    #print(sc)
+    start = int(i*3)
+    end = int(i*3) + 2
+    print(i, start, end)
+    if sc == 'False':
+        for j in range(3):
+            audio_score[start + j] = 0
+    elif sc == 'True':
+        for j in range(3):
+            audio_score[start + j] = 1
+
+
+#Image 처리
 img_list = glob("/home/jinyoung/car_accident_dataset/Demo_20_1280/*.jpg")
 img_list.sort()
 print(len(img_list))
-visual_threshold = 0.85
 visual_label = []
 
 score = [0 for _ in range(len(visual_data))]
@@ -28,11 +56,24 @@ for j in range(len(visual_data)):
 score = np.array(score)
 score_list = [0 for _ in range(len(visual_data))]
 for j in range(len(visual_data)):
-    if j < 30:
-        score_list[j] = score[j]
+    if j < 15:
+        score_list[j] = score[0:j].sum()/(len(score[0:j])+1)
     else:
-        score_list[j] = score[j-30:j].sum() / 30
-print(score_list)
+        score_list[j] = score[j-15:j].sum() / 15
+#Multimodal 처리
+multimodal_score = [0 for _ in range(len(visual_data))]
+for j in range(len(visual_data)):
+    multimodal_score[j] = score_list[j] + audio_score[j]
+multimodal_score = np.array(multimodal_score)
+
+multimodal_label = ["False" for _ in range(len(visual_data))]
+print(len(multimodal_label))
+for j in range(len(visual_data)):
+    if multimodal_score[j] > multimodal_threshold:
+        multimodal_label[j:j+15] = ["True"] * 15
+print(len(multimodal_label),len(multimodal_score),len(score_list), len(audio_score))
+    
+pdb.set_trace()
 for i, filename in enumerate(img_list):
     img = cv2.imread(filename)
     height, width, layers = img.shape
@@ -41,21 +82,51 @@ for i, filename in enumerate(img_list):
     tl = round(0.002 * (3000) / 2) + 1
     tf = max(tl - 1, 1)
     if i < 31:
-        cv2.putText(img, 'Visual : waiting..', (900,80), 0, tl / 3, [0, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+        cv2.putText(img, 'Visual: Standby', (930,150), 0, tl / 3, [0, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+        cv2.putText(img, 'Audio: Standby', (930,200), 0, tl / 3, [0, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+        cv2.putText(img, 'Multimodal: Standby', (620,80), 0, tl / 2, [0, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+        cv2.rectangle(img, (595,25), (1275,105), [0, 255, 255], 5)
     else:
         if score_list[i-31] > visual_threshold:
-            cv2.putText(img, 'Visual : True', (900,80), 0, tl / 3, [0, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+            cv2.putText(img, 'Visual: True', (980,150), 0, tl / 3, [0, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
         elif score_list[i-31] < visual_threshold:
-            cv2.putText(img, 'Visual : False', (900,80), 0, tl / 3, [0, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+            cv2.putText(img, 'Visual: False', (980,150), 0, tl / 3, [0, 0, 255], thickness=tf, lineType=cv2.LINE_AA)
+        
+        if audio_score[i-31] == 1:
+            cv2.putText(img, 'Audio: True', (980,200), 0, tl / 3, [0, 255, 0], thickness=tf, lineType=cv2.LINE_AA)
+        elif audio_score[i-31] == 0:
+            cv2.putText(img, 'Audio: False', (980,200), 0, tl / 3, [0, 0, 255], thickness=tf, lineType=cv2.LINE_AA)
+        
+        if multimodal_label[i-31] == 'True':
+            cv2.putText(img, 'Multimodal: True', (700,80), 0, tl / 2, [255, 0, 0], thickness=tf, lineType=cv2.LINE_AA)
+            cv2.rectangle(img, (695,25), (1275,105), [255, 0, 0], 5)
+        
+        #if audio_score[i-31] == 1 and score_list[i-31] > visual_threshold:
+        #    cv2.putText(img, 'Multimodal: True', (700,80), 0, tl / 2, [255, 0, 0], thickness=tf, lineType=cv2.LINE_AA)
+        #    cv2.rectangle(img, (695,25), (1275,105), [255, 0, 0], 5)
+        #elif audio_score[i-31] == 1 and score_list[i-31] < visual_threshold:    
+        #    cv2.putText(img, 'Multimodal: True', (700,80), 0, tl / 2, [255, 0, 0], thickness=tf, lineType=cv2.LINE_AA)
+        #    cv2.rectangle(img, (695,25), (1275,105), [255, 0, 0], 5)
+        #elif audio_score[i-31] == 1 and score_list[i-31] < visual_threshold:
+        #    cv2.putText(img, 'Multimodal: True', (700,80), 0, tl / 2, [255, 0, 0], thickness=tf, lineType=cv2.LINE_AA)
+        #    cv2.rectangle(img, (695,25), (1275,105), [255, 0, 0], 5)
+        
+        elif multimodal_label[i-31] == 'False':
+            cv2.putText(img, 'Multimodal: False', (700,80), 0, tl / 2, [0, 0, 255], thickness=tf, lineType=cv2.LINE_AA)
+            cv2.rectangle(img, (695,25), (1275,105), [0, 0, 255], 5)
 
-
-out = cv2.VideoWriter('./result/demo_%s_%0.2f.avi'%("demo5", visual_threshold),cv2.VideoWriter_fourcc(*'DIVX'), 30, size)
+out = cv2.VideoWriter('./result/demo_%s_%0.2f.avi'%("demo6", visual_threshold),cv2.VideoWriter_fourcc(*'DIVX'), 30, size)
  
 for i in range(len(img_array)):
     out.write(img_array[i])
 out.release()
 
 
+videoclip = VideoFileClip('./result/demo_%s_%0.2f.avi'%("demo6", visual_threshold)).subclip(0, 20)
+audioclip = AudioFileClip("./20.wav").subclip(0, 20)
+
+videoclip.audio = audioclip
+videoclip.write_videofile("output_%0.2f_%0.2f.mp4"%(visual_threshold, multimodal_threshold))
 
 '''
 

@@ -9,22 +9,39 @@ label_list = glob("/home/jinyoung/road_accident_detection/label/output_*")
 for label in label_list:
     video_name = os.path.basename(label)
     video_name = video_name.split('_')[1]
+    name = "/home/jinyoung/road_accident_detection/label/name_" + video_name
+    print(video_name)
     video_name = video_name.split('.')[0]
     print(video_name)
     with open(label, 'rb') as fr:
         visual_data = pickle.load(fr)
+    with open(name, 'rb') as f:
+        visual_label = pickle.load(f)
+    lab_list = []
+    for i in range(len(visual_label)):
+        for j in range(len(visual_label[i])):
+            lab = int(os.path.basename(visual_label[i][j]).split('_')[1])
+            lab_list.append(lab)
     img_list = glob("/home/jinyoung/car_accident_dataset/%s_1280/*.jpg"%video_name)
+    img_list.sort()
     print(len(img_list))
     visual_threshold = 0.5
     visual_label = []
+
+    ###
     score = [0 for _ in range(len(visual_data))]
     for j in range(len(visual_data)):
+        score[j] = visual_data[lab_list[j]]
+    score = np.array(score)
+    score_list = [0 for _ in range(len(visual_data))]
+    for j in range(len(visual_data)):
         #if j < 30:
-        score[j] = visual_data[j] 
+        score_list[j] = score[j]
         #else:
-        #    score[j] = visual_data[j:j+30].sum() / 30
+        #    score_list[j] = score[j-30:j].sum() / 30
 
-    img_list.sort()
+    ###
+    
     img_array = [] # 없애면 연결되는 현상..?
     for i, filename in enumerate(img_list):
         img = cv2.imread(filename)

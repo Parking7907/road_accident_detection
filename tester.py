@@ -80,7 +80,7 @@ class ModelTester:
                 video_n = ['a' for _ in range(len(names_l))]
                 for i, name in enumerate(names_l):
                     vid_ = os.path.basename(name)
-                    vid_ = vid_.split('_')[0] + vid_.split('_')[2]
+                    vid_ = vid_.split('_')[0] + vid_.split('_')[-1]
                     video_n[i] = vid_
                     if vid_ not in video_dict:
                         video_dict[vid_] = []
