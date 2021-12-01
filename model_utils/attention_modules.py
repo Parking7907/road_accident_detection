@@ -5,7 +5,7 @@ import pdb
 import torch.nn.functional as F
 
 class Spatial_Attention(nn.Module):
-    def __init__(self, n_length):
+    def __init__(self, n_length, save):
         super(Spatial_Attention, self).__init__()
 
         self.post_conv = nn.Sequential(
@@ -19,6 +19,7 @@ class Spatial_Attention(nn.Module):
         )
 
         self.n_length = n_length
+        self.save = save
 
     def forward(self, x):
         '''
@@ -45,8 +46,12 @@ class Spatial_Attention(nn.Module):
         #1392, 1, 224, 224 => 16*29*3 / 1 / 224 / 224att_mn
         att_map = att_map.reshape(-1, self.n_length-1, 3, h, w)
         #형님이 써두신거 [B, 1, T-1, H, W]
-        #pdb.set_trace()
-        return 1 / (1 + torch.exp(-2*(att_map-0.5)))
+        output = 1 / (1 + torch.exp(-2*(att_map-0.5)))
+        #output = 16, 30, 3, 224, 224
+
+        if self.save==True:
+            pdb.set_trace()
+        return output
 
 
 class Temporal_Attention(nn.Module):

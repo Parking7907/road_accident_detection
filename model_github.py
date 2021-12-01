@@ -11,7 +11,7 @@ class MYNET(nn.Module):
     def __init__(self, sequence_size):
         super().__init__()
         self.sequence_size = sequence_size
-        self.motion_features = Spatial_Attention(sequence_size)
+        self.motion_features = Spatial_Attention(sequence_size, True)
         self.backbone = EfficientNet.from_pretrained('efficientnet-b0', in_channels=3)
         self.TA = Temporal_Attention(n_segment=sequence_size//3, feature_dim=1000, num_class=2)
         
