@@ -129,15 +129,9 @@ class ModelTrainer:
             
             correct_cnt += (argmax == labels).sum()
             tot_cnt += B
-            if torch.isnan(batch_loss):
-                print("nan!!")
-                #print(argmax == labels)
-                #print(names)
 
             print("{}/{} --- {}".format(b, batch_size, batch_loss), end='\r')
         
-        if np.isnan(total_loss):
-            print("is nan on", str(epoch), )
 
         return total_loss, (correct_cnt.item()/tot_cnt)*100
     def inference(self, epoch):

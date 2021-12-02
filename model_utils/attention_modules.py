@@ -48,9 +48,6 @@ class Spatial_Attention(nn.Module):
         #형님이 써두신거 [B, 1, T-1, H, W]
         output = 1 / (1 + torch.exp(-2*(att_map-0.5)))
         #output = 16, 30, 3, 224, 224
-
-        if self.save==True:
-            pdb.set_trace()
         return output
 
 

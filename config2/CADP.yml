@@ -5,9 +5,9 @@ use_tb_logger: true
 #### datasets
 datasets:
   name: CADP
-  train: /home/data/jinyoung/Server/Demo6/Original/Train
-  valid: /home/data/jinyoung/Server/Demo6/Original/Test
-  test: /home/data/jinyoung/Server/Demo6/Original/Test
+  train: /home/data/jinyoung/Server/Demo4/Original/Train
+  valid: /home/data/jinyoung/Server/Demo4/Original/Test
+  test: /home/data/jinyoung/Server/Demo4/Original/Test
   demo: /home/jinyoung/road_accident_detection/Demo
   stride: 1
 #/home/data/jinyoung/Server/Demo5/Original/Test/
