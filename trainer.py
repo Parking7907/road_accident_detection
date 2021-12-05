@@ -122,6 +122,7 @@ class ModelTrainer:
             outputs  = self.model(images)
             batch_loss = self.criterion(outputs, labels)
             batch_loss.backward()
+            #pdb.set_trace()
             self.optimizer.step()
 
             total_loss += batch_loss.item()

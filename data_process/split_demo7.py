@@ -5,10 +5,10 @@ from glob import glob
 import numpy as np
 from shutil import rmtree
 from PIL import Image
-true = glob("/home/data/jinyoung/Server/True_Frames_ViNet/*")
-true_loc = "/home/data/jinyoung/Server/True_Frames_ViNet/"
-false = glob("/home/data/jinyoung/Server/False_Frames_ViNet/*")
-false_loc = "/home/data/jinyoung/Server/False_Frames_ViNet/"
+true = glob("/home/data/jinyoung/Server/True_Frames/*")
+true_loc = "/home/data/jinyoung/Server/True_Frames/"
+false = glob("/home/data/jinyoung/Server/False_Frames/*")
+false_loc = "/home/data/jinyoung/Server/False_Frames/"
 #vid_list = ["/home/data/jinyoung/Server/accident_data/000003"]
 true.sort()
 false.sort()
@@ -55,33 +55,32 @@ print("Train len : ", len(Both)-test_len)
 print("Test len :", test_len)
 print("T_F len Train/Test : ",len(T_F)-test_len_TF, test_len_TF)
 print("F_T len Train/Test : ",len(F_T)-test_len_FT, test_len_FT)
-
 for i,vid_n in enumerate(Both):
     if i < test_len:
         print("Both_test :", vid_n)
         for k in true:
             if k.startswith(true_loc + vid_n + '_'):
                 #print("Test True : ",true_loc + vid_n )
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Test/True/"%(k))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Test/True/"%(k))
                 output = subprocess.call(command, shell=True, stdout=None)
         
         for l in false:
             if l.startswith(false_loc + vid_n + '_'):
                 #print("Test False :", false_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Test/False/"%(l))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Test/False/"%(l))
                 output = subprocess.call(command, shell=True, stdout=None)
     else:
         print("Both_train :", vid_n)
         for k in true:
             if k.startswith(true_loc + vid_n + '_'):
                 #print("Train True :", true_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Train/True/"%(k))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Train/True/"%(k))
                 output = subprocess.call(command, shell=True, stdout=None)
         
         for l in false:
             if l.startswith(false_loc + vid_n + '_'):
                 #print("Train False:", false_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Train/False/"%(l))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Train/False/"%(l))
                 output = subprocess.call(command, shell=True, stdout=None)
 print("T_F STARTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 for i,vid_n in enumerate(T_F):
@@ -90,14 +89,14 @@ for i,vid_n in enumerate(T_F):
         for k in true:
             if k.startswith(true_loc + vid_n + '_'):
                 #print("Train True :", true_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Test/True/"%(k))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Test/True/"%(k))
                 output = subprocess.call(command, shell=True, stdout=None)
     else:
         print("T_F_train", vid_n)        
         for k in true:
             if k.startswith(true_loc + vid_n + '_'):
                 #print("Train True :", true_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Train/True/"%(k))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Train/True/"%(k))
                 output = subprocess.call(command, shell=True, stdout=None)
     
 print("F_T STARTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -107,66 +106,12 @@ for i,vid_n in enumerate(F_T):
         for k in false:
             if k.startswith(false_loc + vid_n + '_'):
                 #print("Train False :", false_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Test/False/"%(k))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Test/False/"%(k))
                 output = subprocess.call(command, shell=True, stdout=None)
     else:
         for k in false:
             if k.startswith(false_loc + vid_n + '_'):
                 #print("Train False :", false_loc + vid_n)
-                command = ("cp %s /home/data/jinyoung/Server/Demo2_ViNet/Train/False/"%(k))
+                command = ("cp %s /home/data/jinyoung/Server/Demo7/Train/False/"%(k))
                 output = subprocess.call(command, shell=True, stdout=None)
 
-
-'''
-true_len = len(true_video_list)
-false_len = len(false_video_list)
-test_len1 = int(0.25*true_len)
-test_len1_2 = int(0.5*true_len)
-test_len1_3 = int(0.75*true_len)
-test_len2 = int(0.25*false_len)
-test_len2_2 = int(0.5*false_len)
-test_len2_3 = int(0.75*false_len)
-print(test_len1)
-print("True split")
-print(true_len, test_len1, test_len1_2, test_len1_3)
-print(false_len, test_len2, test_len2_2, test_len2_3)
-
-for i,vid_name in enumerate (true):
-    if i < test_len1:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3/Test/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-    else:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3/Train/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-
-
-
-print("B - True split")
-for i,vid_name in enumerate (true):
-    if test_len1 <= i <test_len1_2 :
-        command = ("cp %s /home/data/jinyoung/Server/Demo3_B/Test/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-    else:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3_B/Train/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-
-print("C - True split")
-
-for i,vid_name in enumerate (true):
-    if test_len1_2 <= i <test_len1_3:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3_C/Test/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-    else:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3_C/Train/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-
-
-print("D - True split")
-for i,vid_name in enumerate (true):
-    if i >= test_len1_3:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3_D/Test/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-    else:
-        command = ("cp %s /home/data/jinyoung/Server/Demo3_D/Train/True/"%(vid_name))
-        output = subprocess.call(command, shell=True, stdout=None)
-'''

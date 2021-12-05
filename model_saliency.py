@@ -7,7 +7,7 @@ from model_utils.attention_modules import Spatial_Attention
 from model_utils.attention_modules import Temporal_Attention
 
 
-class SALNET(nn.Module):
+class MYNET(nn.Module):
     def __init__(self, sequence_size):
         super().__init__()
         self.sequence_size = sequence_size
@@ -21,7 +21,7 @@ class SALNET(nn.Module):
         #rgb Shape = 16 31 3 224 224
         #encoded features = rgb[:, 1:, ...] => 16, 30, 3, 224, 224
         #encoded_features = rgb[:,1:,...]*PA
-        
+        #pdb.set_trace() #RGB = 16 X 30 X 3 X 224 X 224
         backbone_out = self.backbone(rgb.mean(2).reshape(-1, 3, 224, 224))
         temporal_vec = (backbone_out).reshape(B, self.sequence_size//3, -1)
-        return self.TA(temporal_vec), encoded_features
+        return self.TA(temporal_vec)

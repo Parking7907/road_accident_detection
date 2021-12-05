@@ -144,12 +144,12 @@ for i in label['Video_Name']:
         length = 61
     if false_length > 61:
         false_length = 61
-    img_list = image_list[0:false_length]
-    false_img_list = image_list[false_length:length+false_length]
+    false_img_list = image_list[0:false_length]
+    img_list = image_list[false_length:length+false_length]
     #pdb.set_trace()
     print("True Labeling :", st, en, frame, overall)
     start = 0
-    img_list = file_list[st:en]
+    #img_list = file_list[st:en]
     for k in range(frame):
         images = []
         pickle_file_name = true_output + '/' + str(i) + '_' + str(k) + '_' + 'true.pkl'
@@ -171,6 +171,7 @@ for i in label['Video_Name']:
         images = []
         pickle_file_name = false_output + '/' + str(i) + '_' + str(q) + '_' + 'false.pkl'
         pic = open(pickle_file_name, 'wb')
+        
         false_small_img_list = false_img_list[false_start:false_start+31]
         for j in false_small_img_list:
             im = Image.open(j)
@@ -190,12 +191,12 @@ for i in label['Video_Name']:
         length = 61
     if false_length > 61:
         false_length = 61
-    img_list = image_list[0:false_length]
-    false_img_list = image_list[false_length:length+false_length]
+    false_img_list = image_list[0:false_length]
+    img_list = image_list[false_length:length+false_length]
     #pdb.set_trace()
     print("True Labeling :", st, en, frame, overall)
     start = 0
-    img_list = file_list[st:en]
+    #img_list = file_list[st:en]
     for k in range(frame):
         images = []
         pickle_file_name = true_output2 + '/' + str(i) + '_' + str(k) + '_' + 'true.pkl'
